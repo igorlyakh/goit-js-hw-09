@@ -5,6 +5,7 @@ import convertMs from './funcs';
 import { refs } from './refs';
 
 let selectedDate;
+let id;
 
 refs.startBtn.disabled = true;
 
@@ -35,7 +36,7 @@ const startHandler = () => {
   options.clickOpens = false;
   flatpickr(refs.timePicker, options);
   Notify.success('Timer was started!');
-  setInterval(() => {
+  id = setInterval(() => {
     const timer = findDiff(selectedDate);
     makeMarkup(convertMs(timer));
   }, 1000);
@@ -56,7 +57,16 @@ function addLeadingZero(value) {
 
 function findDiff(selectedDate) {
   const today = new Date().getTime();
-  return selectedDate - today;
+  if (selectedDate - today > 0) {
+    return selectedDate - today;
+  } else {
+    clearInterval(id);
+    Notify.info('Time is over!');
+    options.defaultDate = new Date();
+    options.clickOpens = true;
+    flatpickr(refs.timePicker, options);
+    return 0;
+  }
 }
 
 function checkDate(selectedDate) {
